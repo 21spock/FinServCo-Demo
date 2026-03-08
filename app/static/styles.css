@@ -75,6 +75,15 @@ th { color: #cbd5e1; font-size: 0.9rem; }
 .pill.needs_clarification { background: rgba(245, 158, 11, 0.18); color: #fde68a; border-color: rgba(245, 158, 11, 0.25); }
 .pill.senior_review { background: rgba(239, 68, 68, 0.18); color: #fecaca; border-color: rgba(239, 68, 68, 0.25); }
 .pill.neutral { background: rgba(148, 163, 184, 0.12); color: #d1d5db; border-color: rgba(148, 163, 184, 0.22); }
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.helper-text {
+  color: #f59e0b;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
 a { color: #93c5fd; }
 code { color: #bfdbfe; }
 @media (max-width: 1100px) {

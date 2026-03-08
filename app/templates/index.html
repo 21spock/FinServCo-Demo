@@ -89,7 +89,10 @@
             </tbody>
           </table>
           <div class="launch-row">
-            <button type="submit">Launch Devin fixes</button>
+            <button type="submit" {% if not has_api_key %}disabled{% endif %}>Launch Devin fixes</button>
+            {% if not has_api_key %}
+            <p class="helper-text">DEVIN_API_KEY is not configured. Set it in your environment to enable live launch.</p>
+            {% endif %}
           </div>
         </form>
       </section>
