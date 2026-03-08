@@ -77,6 +77,23 @@ th { color: #cbd5e1; font-size: 0.9rem; }
 .pill.neutral { background: rgba(148, 163, 184, 0.12); color: #d1d5db; border-color: rgba(148, 163, 184, 0.22); }
 a { color: #93c5fd; }
 code { color: #bfdbfe; }
+.filter-chips { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.chip {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.15s, border-color 0.15s;
+}
+.chip:hover { border-color: #93c5fd; }
+.chip.active { background: #2563eb; border-color: #2563eb; color: white; }
+.chip-count { opacity: 0.7; margin-left: 4px; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+.api-key-hint { color: #fbbf24; font-size: 0.85rem; align-self: center; }
 @media (max-width: 1100px) {
   .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .shell { width: min(100%, calc(100% - 24px)); }

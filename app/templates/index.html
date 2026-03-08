@@ -37,6 +37,12 @@
             <p>Show how Devin scopes each backlog item before a human approves execution.</p>
           </div>
         </div>
+        <div class="filter-chips">
+          <button type="button" class="chip active" data-lane="all">All <span class="chip-count">{{ counts.total }}</span></button>
+          <button type="button" class="chip" data-lane="ready_for_devin">Ready for Devin <span class="chip-count">{{ counts.ready }}</span></button>
+          <button type="button" class="chip" data-lane="needs_clarification">Needs clarification <span class="chip-count">{{ counts.clarify }}</span></button>
+          <button type="button" class="chip" data-lane="senior_review">Senior review <span class="chip-count">{{ counts.senior }}</span></button>
+        </div>
         <form method="post" action="/launch">
           <table>
             <thead>
@@ -54,7 +60,7 @@
             </thead>
             <tbody>
               {% for issue in issues %}
-              <tr>
+              <tr data-lane="{{ issue.devin_lane or 'not_scoped' }}">
                 <td>
                   {% if issue.devin_lane == 'ready_for_devin' %}
                   <input type="checkbox" name="issue_ids" value="{{ issue.id }}" {% if issue.selected_for_fix %}checked disabled{% endif %}/>
@@ -89,7 +95,10 @@
             </tbody>
           </table>
           <div class="launch-row">
-            <button type="submit">Launch Devin fixes</button>
+            <button type="submit" {% if not has_api_key %}disabled{% endif %}>Launch Devin fixes</button>
+            {% if not has_api_key %}
+            <span class="api-key-hint">DEVIN_API_KEY is not configured. Set it in your environment to enable live launches.</span>
+            {% endif %}
           </div>
         </form>
       </section>
@@ -134,5 +143,17 @@
         </table>
       </section>
     </main>
+    <script>
+      document.querySelectorAll('.filter-chips .chip').forEach(function(chip) {
+        chip.addEventListener('click', function() {
+          document.querySelectorAll('.filter-chips .chip').forEach(function(c) { c.classList.remove('active'); });
+          chip.classList.add('active');
+          var lane = chip.getAttribute('data-lane');
+          document.querySelectorAll('tbody tr[data-lane]').forEach(function(row) {
+            row.style.display = (lane === 'all' || row.getAttribute('data-lane') === lane) ? '' : 'none';
+          });
+        });
+      });
+    </script>
   </body>
 </html>

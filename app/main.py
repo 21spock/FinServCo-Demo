@@ -338,7 +338,8 @@ def get_dashboard() -> dict[str, Any]:
         "senior": sum(1 for i in issues if i.get("devin_lane") == "senior_review"),
         "fix_runs": sum(1 for s in sessions if s["session_type"] == "fix"),
     }
-    return {"issues": issues, "sessions": sessions, "counts": counts}
+    has_api_key = bool(os.environ.get("DEVIN_API_KEY", "").strip())
+    return {"issues": issues, "sessions": sessions, "counts": counts, "has_api_key": has_api_key}
 
 
 @app.on_event("startup")
