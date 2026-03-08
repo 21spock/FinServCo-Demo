@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Devin Jira Control Plane</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero card">
+        <p class="eyebrow">Enterprise backlog workflow demo</p>
+        <h1>Devin Jira Control Plane</h1>
+        <p class="lede">
+          Use Jira as the backlog source of truth, let Devin scope each ticket against the codebase,
+          approve the right tickets to act on, and track Devin execution status back in one view.
+        </p>
+        <div class="actions">
+          <form method="post" action="/reset"><button class="secondary" type="submit">Reset demo state</button></form>
+          <form method="post" action="/scope"><button type="submit">Scope issues with Devin</button></form>
+          <form method="post" action="/sync"><button class="secondary" type="submit">Sync Devin status</button></form>
+        </div>
+      </section>
+
+      <section class="stats-grid">
+        <article class="card stat"><span>Total tickets</span><strong>{{ counts.total }}</strong></article>
+        <article class="card stat"><span>Ready for Devin</span><strong>{{ counts.ready }}</strong></article>
+        <article class="card stat"><span>Needs clarification</span><strong>{{ counts.clarify }}</strong></article>
+        <article class="card stat"><span>Senior review</span><strong>{{ counts.senior }}</strong></article>
+        <article class="card stat"><span>Fix sessions launched</span><strong>{{ counts.fix_runs }}</strong></article>
+      </section>
+
+      <section class="card">
+        <div class="section-header">
+          <div>
+            <h2>Scoped Jira tickets</h2>
+            <p>Show how Devin scopes each backlog item before a human approves execution.</p>
+          </div>
+        </div>
+        <form method="post" action="/launch">
+          <table>
+            <thead>
+              <tr>
+                <th>Approve</th>
+                <th>Ticket</th>
+                <th>Labels</th>
+                <th>Devin recommendation</th>
+                <th>Confidence</th>
+                <th>Likely files</th>
+                <th>Risks</th>
+                <th>Missing info</th>
+                <th>Rationale</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for issue in issues %}
+              <tr>
+                <td>
+                  {% if issue.devin_lane == 'ready_for_devin' %}
+                  <input type="checkbox" name="issue_ids" value="{{ issue.id }}" {% if issue.selected_for_fix %}checked disabled{% endif %}/>
+                  {% else %}
+                  —
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="ticket-id">{{ issue.external_id }}</div>
+                  <strong>{{ issue.title }}</strong>
+                  <p class="muted">{{ issue.description }}</p>
+                </td>
+                <td>
+                  {% for label in issue.labels %}
+                  <span class="pill neutral">{{ label }}</span>
+                  {% endfor %}
+                </td>
+                <td>
+                  {% if issue.devin_lane %}
+                  <span class="pill {{ issue.devin_lane }}">{{ lane_labels[issue.devin_lane] }}</span>
+                  {% else %}
+                  <span class="pill neutral">Not scoped</span>
+                  {% endif %}
+                </td>
+                <td>{{ issue.confidence or '-' }}</td>
+                <td>{{ issue.likely_files or '-' }}</td>
+                <td>{{ issue.risk_flags or '-' }}</td>
+                <td>{{ issue.missing_info or '-' }}</td>
+                <td>{{ issue.rationale or '-' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <div class="launch-row">
+            <button type="submit">Launch Devin fixes</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <div class="section-header">
+          <div>
+            <h2>Devin sessions</h2>
+            <p>Use this table to show scoping sessions, approved fix sessions, and status visibility for the team.</p>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Session ref</th>
+              <th>Ticket</th>
+              <th>Status</th>
+              <th>Summary</th>
+              <th>PR</th>
+              <th>Error / blocker</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for session in sessions %}
+            <tr>
+              <td><span class="pill neutral">{{ session.session_type }}</span></td>
+              <td><code>{{ session.session_ref }}</code></td>
+              <td>
+                <div class="ticket-id">{{ session.external_id }}</div>
+                {{ session.title }}
+              </td>
+              <td><span class="pill neutral">{{ session.status }}</span></td>
+              <td>{{ session.summary or '-' }}</td>
+              <td>{% if session.pr_url %}<a href="{{ session.pr_url }}" target="_blank">PR link</a>{% else %}-{% endif %}</td>
+              <td>{{ session.error_text or '-' }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7">No Devin sessions yet. Scope issues first.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>
