@@ -349,9 +349,15 @@ def startup() -> None:
 
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request) -> HTMLResponse:
+    devin_key_configured = bool(os.environ.get("DEVIN_API_KEY", "").strip())
     return TEMPLATES.TemplateResponse(
         "index.html",
-        {"request": request, **get_dashboard(), "lane_labels": LANE_LABELS},
+        {
+            "request": request,
+            **get_dashboard(),
+            "lane_labels": LANE_LABELS,
+            "devin_key_configured": devin_key_configured,
+        },
     )
 
 

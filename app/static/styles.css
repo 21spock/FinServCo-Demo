@@ -77,6 +77,16 @@ th { color: #cbd5e1; font-size: 0.9rem; }
 .pill.neutral { background: rgba(148, 163, 184, 0.12); color: #d1d5db; border-color: rgba(148, 163, 184, 0.22); }
 a { color: #93c5fd; }
 code { color: #bfdbfe; }
+button:disabled {
+  background: var(--neutral);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.helper-text {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: 8px;
+}
 @media (max-width: 1100px) {
   .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .shell { width: min(100%, calc(100% - 24px)); }
