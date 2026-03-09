@@ -192,29 +192,7 @@ def reset_demo() -> tuple[bool, str]:
             conn.execute("DELETE FROM sqlite_sequence WHERE name='issues'")
             conn.execute("DELETE FROM sqlite_sequence WHERE name='sessions'")
 
-            for issue in SEED_ISSUES:
-                ts = now_iso()
-                conn.execute(
-                    """
-                    INSERT OR REPLACE INTO issues (
-                        external_id, title, description, source, acceptance, labels_json,
-                        suggested_lane, created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """,
-                    (
-                        issue["external_id"],
-                        issue["title"],
-                        issue["description"],
-                        issue["source"],
-                        issue["acceptance"],
-                        json.dumps(issue["labels"]),
-                        issue["suggested_lane"],
-                        ts,
-                        ts,
-                    ),
-                )
-
-            return True, f"Successfully loaded {len(SEED_ISSUES)} issues"
+            return seed_issues(conn)
     except Exception as e:
         return False, f"Import failed: {e}"
 
