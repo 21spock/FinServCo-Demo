@@ -37,6 +37,20 @@
             <p>Show how Devin scopes each backlog item before a human approves execution.</p>
           </div>
         </div>
+        <div class="filter-chips">
+          <button type="button" class="chip active" data-filter="all">
+            All ({{ counts.total }})
+          </button>
+          <button type="button" class="chip" data-filter="ready_for_devin">
+            Ready for Devin ({{ counts.ready }})
+          </button>
+          <button type="button" class="chip" data-filter="needs_clarification">
+            Needs clarification ({{ counts.clarify }})
+          </button>
+          <button type="button" class="chip" data-filter="senior_review">
+            Senior review ({{ counts.senior }})
+          </button>
+        </div>
         <form method="post" action="/launch">
           <table>
             <thead>
@@ -54,7 +68,7 @@
             </thead>
             <tbody>
               {% for issue in issues %}
-              <tr>
+              <tr data-lane="{{ issue.devin_lane or 'not_scoped' }}">
                 <td>
                   {% if issue.devin_lane == 'ready_for_devin' %}
                   <input type="checkbox" name="issue_ids" value="{{ issue.id }}" {% if issue.selected_for_fix %}checked disabled{% endif %}/>
@@ -134,5 +148,28 @@
         </table>
       </section>
     </main>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        var chips = document.querySelectorAll('.chip');
+        var rows = document.querySelectorAll('tbody tr[data-lane]');
+
+        chips.forEach(function (chip) {
+          chip.addEventListener('click', function () {
+            chips.forEach(function (c) { c.classList.remove('active'); });
+            chip.classList.add('active');
+
+            var filter = chip.getAttribute('data-filter');
+
+            rows.forEach(function (row) {
+              if (filter === 'all' || row.getAttribute('data-lane') === filter) {
+                row.style.display = '';
+              } else {
+                row.style.display = 'none';
+              }
+            });
+          });
+        });
+      });
+    </script>
   </body>
 </html>

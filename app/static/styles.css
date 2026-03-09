@@ -75,6 +75,26 @@ th { color: #cbd5e1; font-size: 0.9rem; }
 .pill.needs_clarification { background: rgba(245, 158, 11, 0.18); color: #fde68a; border-color: rgba(245, 158, 11, 0.25); }
 .pill.senior_review { background: rgba(239, 68, 68, 0.18); color: #fecaca; border-color: rgba(239, 68, 68, 0.25); }
 .pill.neutral { background: rgba(148, 163, 184, 0.12); color: #d1d5db; border-color: rgba(148, 163, 184, 0.22); }
+.filter-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--muted);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.chip:hover { background: rgba(148, 163, 184, 0.18); color: var(--text); }
+.chip.active { background: #2563eb; color: white; border-color: #2563eb; }
+.chip.active:hover { background: #1d4ed8; border-color: #1d4ed8; }
+.chip[data-filter="ready_for_devin"].active { background: rgba(16, 185, 129, 0.25); color: #a7f3d0; border-color: rgba(16, 185, 129, 0.4); }
+.chip[data-filter="needs_clarification"].active { background: rgba(245, 158, 11, 0.25); color: #fde68a; border-color: rgba(245, 158, 11, 0.4); }
+.chip[data-filter="senior_review"].active { background: rgba(239, 68, 68, 0.25); color: #fecaca; border-color: rgba(239, 68, 68, 0.4); }
 a { color: #93c5fd; }
 code { color: #bfdbfe; }
 @media (max-width: 1100px) {
