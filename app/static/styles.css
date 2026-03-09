@@ -47,6 +47,7 @@ button {
   cursor: pointer;
   font-weight: 600;
 }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
 button.secondary { background: var(--panel-2); border: 1px solid var(--border); }
 .stats-grid {
   display: grid;
