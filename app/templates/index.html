@@ -89,7 +89,10 @@
             </tbody>
           </table>
           <div class="launch-row">
-            <button type="submit">Launch Devin fixes</button>
+            <button type="submit" {% if not devin_api_key_set %}disabled{% endif %}>Launch Devin fixes</button>
+            {% if not devin_api_key_set %}
+            <p class="helper-warning">Live launch unavailable - set DEVIN_API_KEY to enable</p>
+            {% endif %}
           </div>
         </form>
       </section>
