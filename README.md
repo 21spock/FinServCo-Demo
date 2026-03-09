@@ -11,7 +11,7 @@ This app is built to support a Jira-first story:
 
 ## Why this repo exists
 
-This is not meant to be a production backlog platform. It is a clean demo repo you can upload to GitHub and use to:
+This is not meant to be a production backlog platform.
 1. create 6 intentional GitHub issues
 2. mirror those issues into Jira tickets
 3. ask Devin to scope the tickets
