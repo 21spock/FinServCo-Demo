@@ -57,7 +57,7 @@
               <tr>
                 <td>
                   {% if issue.devin_lane == 'ready_for_devin' %}
-                  <input type="checkbox" name="issue_ids" value="{{ issue.id }}" {% if issue.selected_for_fix %}checked disabled{% endif %}/>
+                  <input type="checkbox" name="issue_ids" value="{{ issue.id }}" {% if issue.selected_for_fix %}checked disabled{% endif %} {% if not devin_key_set %}disabled{% endif %}/>
                   {% else %}
                   —
                   {% endif %}
@@ -89,7 +89,10 @@
             </tbody>
           </table>
           <div class="launch-row">
-            <button type="submit">Launch Devin fixes</button>
+            <button type="submit" {% if not devin_key_set %}disabled{% endif %}>Launch Devin fixes</button>
+            {% if not devin_key_set %}
+            <p class="launch-hint">Live launch is unavailable because DEVIN_API_KEY is not configured.</p>
+            {% endif %}
           </div>
         </form>
       </section>
