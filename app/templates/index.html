@@ -22,6 +22,12 @@
         </div>
       </section>
 
+      {% if request.query_params.get('status') %}
+      <section class="message-banner {{ 'success' if request.query_params.get('status') == 'success' else 'error' }}">
+        {{ request.query_params.get('message', '') }}
+      </section>
+      {% endif %}
+
       <section class="stats-grid">
         <article class="card stat"><span>Total tickets</span><strong>{{ counts.total }}</strong></article>
         <article class="card stat"><span>Ready for Devin</span><strong>{{ counts.ready }}</strong></article>

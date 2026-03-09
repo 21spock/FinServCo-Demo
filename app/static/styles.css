@@ -75,6 +75,23 @@ th { color: #cbd5e1; font-size: 0.9rem; }
 .pill.needs_clarification { background: rgba(245, 158, 11, 0.18); color: #fde68a; border-color: rgba(245, 158, 11, 0.25); }
 .pill.senior_review { background: rgba(239, 68, 68, 0.18); color: #fecaca; border-color: rgba(239, 68, 68, 0.25); }
 .pill.neutral { background: rgba(148, 163, 184, 0.12); color: #d1d5db; border-color: rgba(148, 163, 184, 0.22); }
+.message-banner {
+  border-radius: 12px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.message-banner.success {
+  background: rgba(6, 95, 70, 0.35);
+  color: #a7f3d0;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.message-banner.error {
+  background: rgba(127, 29, 29, 0.35);
+  color: #fecaca;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
 a { color: #93c5fd; }
 code { color: #bfdbfe; }
 @media (max-width: 1100px) {

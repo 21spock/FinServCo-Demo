@@ -8,6 +8,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from urllib.parse import quote
+
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -138,39 +140,83 @@ def init_db() -> None:
         )
 
 
-def seed_issues() -> None:
-    with db() as conn:
-        count = conn.execute("SELECT COUNT(*) AS count FROM issues").fetchone()["count"]
-        if count:
-            return
-        for issue in SEED_ISSUES:
-            ts = now_iso()
-            conn.execute(
-                """
-                INSERT INTO issues (
-                    external_id, title, description, source, acceptance, labels_json,
-                    suggested_lane, created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    issue["external_id"],
-                    issue["title"],
-                    issue["description"],
-                    issue["source"],
-                    issue["acceptance"],
-                    json.dumps(issue["labels"]),
-                    issue["suggested_lane"],
-                    ts,
-                    ts,
-                ),
-            )
+def seed_issues(conn: sqlite3.Connection | None = None) -> tuple[bool, str]:
+    """Insert seed issues using INSERT OR REPLACE for idempotent upserts.
+
+    If *conn* is provided the caller owns the transaction; otherwise a
+    new connection is created.
+    """
+    def _do_seed(c: sqlite3.Connection) -> tuple[bool, str]:
+        try:
+            for issue in SEED_ISSUES:
+                ts = now_iso()
+                c.execute(
+                    """
+                    INSERT OR REPLACE INTO issues (
+                        external_id, title, description, source, acceptance, labels_json,
+                        suggested_lane, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        issue["external_id"],
+                        issue["title"],
+                        issue["description"],
+                        issue["source"],
+                        issue["acceptance"],
+                        json.dumps(issue["labels"]),
+                        issue["suggested_lane"],
+                        ts,
+                        ts,
+                    ),
+                )
+            return True, f"Successfully loaded {len(SEED_ISSUES)} issues"
+        except Exception as e:
+            return False, f"Seed failed: {e}"
+
+    if conn is not None:
+        return _do_seed(conn)
+    with db() as c:
+        return _do_seed(c)
 
 
-def reset_demo() -> None:
-    with db() as conn:
-        conn.execute("DELETE FROM sessions")
-        conn.execute("DELETE FROM issues")
-    seed_issues()
+def reset_demo() -> tuple[bool, str]:
+    """Atomically clear and re-seed the demo database.
+
+    All DELETE and INSERT operations run inside a single transaction so
+    the database is never left in a partially-reset state.
+    """
+    try:
+        with db() as conn:
+            conn.execute("DELETE FROM sessions")
+            conn.execute("DELETE FROM issues")
+            conn.execute("DELETE FROM sqlite_sequence WHERE name='issues'")
+            conn.execute("DELETE FROM sqlite_sequence WHERE name='sessions'")
+
+            for issue in SEED_ISSUES:
+                ts = now_iso()
+                conn.execute(
+                    """
+                    INSERT OR REPLACE INTO issues (
+                        external_id, title, description, source, acceptance, labels_json,
+                        suggested_lane, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        issue["external_id"],
+                        issue["title"],
+                        issue["description"],
+                        issue["source"],
+                        issue["acceptance"],
+                        json.dumps(issue["labels"]),
+                        issue["suggested_lane"],
+                        ts,
+                        ts,
+                    ),
+                )
+
+            return True, f"Successfully loaded {len(SEED_ISSUES)} issues"
+    except Exception as e:
+        return False, f"Import failed: {e}"
 
 
 def scope_issue(issue: sqlite3.Row) -> dict[str, Any]:
@@ -357,8 +403,9 @@ def index(request: Request) -> HTMLResponse:
 
 @app.post("/reset")
 def reset() -> RedirectResponse:
-    reset_demo()
-    return RedirectResponse("/", status_code=303)
+    success, message = reset_demo()
+    status = "success" if success else "error"
+    return RedirectResponse(f"/?status={status}&message={quote(message)}", status_code=303)
 
 
 @app.post("/scope")
